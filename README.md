@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/TheSteelGuy/Hello-Books.svg?branch=master)](https://travis-ci.org/TheSteelGuy/Hello-Books)
+
 # Hello-Books app
 
 ### Introduction
