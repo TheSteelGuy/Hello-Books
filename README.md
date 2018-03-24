@@ -43,7 +43,7 @@ With the app Hello-Books:
 #### Testing:
 * Install nosetests `pip install nose`
 
-* Run the tests `nosetests -`
+* Run the tests `nosetests `
 #### Flask API endpoints
 
 | Endpoints                                       |       Functionality                  |
