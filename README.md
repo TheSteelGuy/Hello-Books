@@ -56,4 +56,4 @@ With the app Hello-Books:
 | `PUT /api/v1/books/<bookId>`                    |  modify a book’s information         |
 | `DELETE /api/v1/books/<bookId>`                 |  Remove a book                       |
 | `POST  /api/v1/users/books/<bookId>`            |  Borrow book                         |
-|` POST /api/v1/logout`                           |  logs in a user                      |
+|` POST /api/v1/logout`                           |  logs out a user                      |
