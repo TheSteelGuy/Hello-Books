@@ -27,38 +27,22 @@ With the app Hello-Books:
 * Return a book
 
 
-Bright Events application lets you create and manage events.
-
-[click here to access bright events github pages][2]
-
-#### Getting Started
-To start using the Bright Event:
-git clone:
-`https://github.com/betsybeth/Bright_event.git`  
-into your computer
-* change your directory into `cd Bright_event`
-#### Usage
-with Bright Event you can:
-* create an account
-* login into the account
-* create an event
-* update an event
-* view an event
-* delete an event
-* add RSVP into the event
-* update RSVP card
-* delete an RSVP card
-* logout
 #### Setting
 * First install the virtual environment globally `sudo pip instal virtualenv`
-* create the virtual enviroment `virtualenv --python=python3 myenv`
+* create the virtual enviroment `virtualenv --python=python2.7 myenv`
+* change directory to myenv
 * activate virtual environment `source myenv/bin/activate`
-* type `export FLASK_CONFIG=development`
+* run pip install requirements.txt
+* clone the repo
+* change directory to the repo
+* type`export FLASK_CONFIG=development` 
+
 #### How to run flask
 * Run  `python run.py`
 
 #### Testing:
 * Install nosetests `pip install nose`
+
 * Run the tests `nosetests -`
 #### Flask API endpoints
 
@@ -73,13 +57,3 @@ with Bright Event you can:
 | `DELETE /api/v1/books/<bookId>`                 |  Remove a book                       |
 | `POST  /api/v1/users/books/<bookId>`            |  Borrow book                         |
 |` POST /api/v1/logout`                           |  logs in a user                      |
-
-### Credits
-* [Collins][1]
-
-
- 
-
-
-
-
