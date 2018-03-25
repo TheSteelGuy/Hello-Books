@@ -4,6 +4,7 @@
 #third party imports
 from flask_testing import TestCase
 import unittest
+import json
 #local import
 from app import user,admin_user,create_app
 
@@ -11,13 +12,15 @@ class TestBase(TestCase):
     """ common class"""
     def create_app(self):
          config_name = 'testing'
-         app = create_app(config_name)
-         return app
+         self.app = create_app(config_name)
+         self.client = self.app.test_client()
+         return self.app
     
     def setUp(self):
         """ gets run before any test"""
         self.user1 = user.register('testuser','testemail@gmail.com','testpass1','testpass1')
         self.admin = admin_user.add_book('testauthor','testtitle','testpublisher','tested','testcateg')
+
 
     def tearDown(self):
         admin_user.users_list = list()
@@ -64,6 +67,12 @@ class TestUser(TestBase):
         """tests login"""
         user1 = user.login('testemail@gmail.com','testpass1')
         self.assertEqual(user1,'succsefully logged in')
+    
+    def test_get_books(self):
+        """test user access to all books"""
+        books = admin_user.get_all_books()
+        self.assertEqual(len(books),6)
+        
     def test_user_borrow(self):
         """test if a user can borrow a book"""
         borrow = user.borrow_book('testauthor','testtitle','publisher','edition','testemail@gmail.com')
@@ -112,6 +121,7 @@ class TestAdmin(TestBase):
         """tests wrong title and author details"""
         delete = admin_user.delete_book_details(author="testauthor",title="title")
         self.assertEqual(delete,'check the author details for spelling errors')
+
 
         
         
