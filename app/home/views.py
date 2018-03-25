@@ -24,10 +24,11 @@ def register():
             }
         )), 200
     if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirm_pwd = request.form.get('confirm_pwd') 
+        details = request.get_json()
+        username = details.get('username')
+        email = details.get('email')
+        password = details.get('password')
+        confirm_pwd = details.get('confirm_pwd')
         response = user.register(username,email,password,confirm_pwd)
         if response == 'username exists choose another name!':    
            return make_response(jsonify(
@@ -67,8 +68,9 @@ def login():
             {'message':'welcome to the login endpoint'}
         )), 200
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        details = request.get_json()
+        email = details.get('email')
+        password = details.get('password')
         response = user.login(email,password)
         if response == "succsefully logged in":
             return make_response(jsonify(
