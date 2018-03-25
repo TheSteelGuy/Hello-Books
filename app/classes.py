@@ -4,7 +4,6 @@
 """ modules import"""
 from datetime import date
 import re
-import uuid
 
 class Base(object):
     """parent class for common methods"""
@@ -22,7 +21,6 @@ class Base(object):
             if book_details['category'] == category:
                 self.books_category_list.append(book_details)
                 return self.books_category_list
-
             
             return "no books in"+" " + str(category) +" " " are available"
         return "no books by that category in the library"
@@ -34,6 +32,13 @@ class Base(object):
                 return self.user_borrowed_books
             return "email does not exist"
         return "there are no books in the library"
+
+    def get_all_books(self):
+        """ gets all books within the library"""
+        for book in self.books_list:
+            if len(self.books_list) != 0:
+                return book
+            return "books unavailable"
 
 
     def user_borrowing_history(self, email):
@@ -55,28 +60,26 @@ class User(Base):
         """ Registration"""
         registration_dict = dict()
         for user in self.users_list:
-            if user['username']== username:
+            if username == user['username']:
                 return 'username exists choose another name!'
-            elif user['email']==email:
+            if user['email'] == email:
                  return "Email is already in use"
+        if not re.findall(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+          return "Invalid email"
+    
+        if len(password) < 3:
+          return "password length should be more than 3 characters"
+        if username.strip() == "" or not username.isalpha():
+          return  "username cannot be empty, or non alphabet"
+        if password != confirm_pwd:
+         return "password does not match"
         else:
-           if not re.findall(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
-              return "Invalid email"
-        
-           elif len(password) < 3:
-              return "password length should be more than 3 characters"
-           elif username.strip() == "" or not username.isalpha():
-              return  "username cannot be empty, or non alphabet"
-           elif password != confirm_pwd:
-             return "password does not match"
-           else:
-               registration_dict['username'] = username
-               registration_dict['email']  = email
-               registration_dict['password'] = password
-               registration_dict['is_admin'] = self.is_admin
-               self.users_list.append(registration_dict)
-             
-               return "registration succesfull"
+           registration_dict['username'] = username
+           registration_dict['email']  = email
+           registration_dict['password'] = password
+           registration_dict['is_admin'] = self.is_admin
+           self.users_list.append(registration_dict)
+           return "registration succesfull"
                
     def login(self, email, password):
          """login method"""
@@ -87,6 +90,7 @@ class User(Base):
              
                 return "Inavlid username password"
          return "you have no account, register"
+
     
     def borrow_book(self, author, title, publisher, edition, email):
         """handles borrowing of books by registered users"""
@@ -159,7 +163,6 @@ class Admin(Base):
            book_dict['publisher'] = publisher
            book_dict['edition'] = edition
            book_dict['category'] = category
-           book_dict['book_id'] = str(uuid.uuid4())
            book_dict['date_added'] = date.today().isoformat()
            self.books_list.append(book_dict)
            self.total_books += 1
