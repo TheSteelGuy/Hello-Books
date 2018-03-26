@@ -16,6 +16,7 @@ admin_user = Admin()
 
 def create_app(config_name):
     app = Flask(__name__)
+    app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
     app.config.from_object(app_config[config_name])
     from admin import admin as admin_blueprint
     from home import home as home_blueprint
