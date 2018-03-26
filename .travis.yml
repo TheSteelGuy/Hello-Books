@@ -8,9 +8,7 @@ install:
 
 
 after_success:
-  - coveralls
+  coveralls
 script:
-- script: nosetests --with-coverage --cover-package=app 
+- nosetests --with-coverage --cover-package=app && coverage report
 
-
-  
