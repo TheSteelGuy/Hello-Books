@@ -71,12 +71,13 @@ class TestUser(TestBase):
     def test_get_books(self):
         """test user access to all books"""
         books = admin_user.get_all_books()
-        self.assertEqual(len(books),6)
+        self.assertEqual(len(books),7)
         
     def test_user_borrow(self):
         """test if a user can borrow a book"""
-        borrow = user.borrow_book('testauthor','testtitle','publisher','edition','testemail@gmail.com')
-        self.assertEqual(borrow,'book borrowed')
+        book_id = admin_user.books_list[0]['book_id']
+        borrow = user.borrow_book('testauthor','testtitle','testpublisher','tested',book_id)
+        self.assertIn('author', borrow)
 
 class TestAdmin(TestBase):
     """tests admin methods"""
@@ -92,35 +93,29 @@ class TestAdmin(TestBase):
     
     def test_modify_book(self):
         """test moddify book"""
-        author =  admin_user.books_list[0]['author']
-        title = admin_user.books_list[0]['title']
-        admin_user.modify_book_details('new_name','new_title','new_publisher','new_edition','new_categ',author,title)
+        book_id = admin_user.books_list[0]['book_id']
+        admin_user.modify_book_details('new_name','new_title','new_publisher','new_edition','new_categ', book_id)
         self.assertTrue('new_name'== admin_user.books_list[0]['author'])
 
     def test_delete_book(self):
         """tests admin delete book details"""
         admin_user.add_book('testauthor2','testtitle2','testpublisher2','tested2','testcateg2')
-        author = admin_user.books_list[0]['author']
-        title = admin_user.books_list[0]['title']
-        delete = admin_user.delete_book_details(author,title)
-        self.assertEqual(delete,'deleted')
+        book_id = admin_user.books_list[0]['book_id']
+        delete = admin_user.delete_book_details(book_id)
+        self.assertEqual(delete,'book deleted')
         self.assertFalse(len(admin_user.books_list)==2)
 
     def test_delete_with_wrong_details(self):
-        """tests wrong title and author details"""
-        delete = admin_user.delete_book_details(author="author",title="title")
+        """tests delete with wrong  book id details"""
+        book_id = "nvjkbvksbhckvbhc"
+        delete = admin_user.delete_book_details(book_id)
         self.assertEqual(delete,'book does not exist')
     
     def test_filter_by_category(self):
         """test category"""
-        book2 = admin_user.add_book('author2','testtitle2','testpublisher2','tested2','testcateg')
-        category = admin_user.filter_books_by_category('testcateg')
+        admin_user.add_book('author2','testtitle2','testpublisher2','tested2','testcateg')
+        admin_user.filter_books_by_category('testcateg')
         self.assertTrue(len(admin_user.books_list)==2)
-
-    def test_delete_with_wrong_title(self):
-        """tests wrong title and author details"""
-        delete = admin_user.delete_book_details(author="testauthor",title="title")
-        self.assertEqual(delete,'check the author details for spelling errors')
 
 
         
