@@ -4,6 +4,7 @@
 """ modules import"""
 from datetime import date
 import re
+import uuid
 
 class Base(object):
     """parent class for common methods"""
@@ -92,10 +93,12 @@ class User(Base):
          return "you have no account, register"
 
     
-    def borrow_book(self, author, title, publisher, edition, email):
+    def borrow_book(self, author, title, publisher, edition, book_id):
         """handles borrowing of books by registered users"""
-        for user in self.users_list:
-            if user['email'] == email:
+        for book in self.books_list:
+            if book['book_id'] != str(book_id):
+               return 'book does not exist'
+        else: 
                 book = {
                     'author' : author,
                     'title' : title,
@@ -103,9 +106,8 @@ class User(Base):
                     'edition' : edition
                 }
                 self.borrowed_books.append(book)
-                return 'book borrowed'
-            return 'wrong email address'
-        return 'book does not exist'
+                return book
+        
 
     def return_book(self, author, title, email):
         """handles returning borrowed book"""
@@ -142,9 +144,14 @@ class Admin(Base):
                 return "Inavlid username or password for admin"
             return "you are not an admin"
     
-    def change_default_password(self):
+    def reset_default_password(self,username, password, new_username, new_pwd):
         """reset the admin credetials from default values"""
-        pass
+        for admin_dict in self.admin_list:
+            if admin_dict['username'] != username:
+                return "wrong username"
+            if admin_dict['password'] != password:
+                return 'wrong password'
+
 
     def get_all_users(self):
         """users who have registered"""
@@ -163,15 +170,16 @@ class Admin(Base):
            book_dict['publisher'] = publisher
            book_dict['edition'] = edition
            book_dict['category'] = category
+           book_dict['book_id'] = str(uuid.uuid4())
            book_dict['date_added'] = date.today().isoformat()
            self.books_list.append(book_dict)
            self.total_books += 1
-           return "book created"   
-    def modify_book_details(self, new_author, new_title, new_publisher, new_edition, new_category, author, title):
+           return "book created" 
+
+    def modify_book_details(self, new_author, new_title, new_publisher, new_edition, new_category, book_id):
         """updates book details"""
         for book_dict in self.books_list:
-            if book_dict['author'] == author:
-                if book_dict['title'] == title:   
+            if book_dict['book_id'] == book_id: 
                    new_details=  {
                      'author' :new_author,
                      'title':new_title, 
@@ -181,19 +189,16 @@ class Admin(Base):
                    }
                    book_dict.update(new_details)
                    return "book details updated"
-                return "check spelling errors in book title"
-            return "check spelling errors in  author details"
-        return "book not existing, you can add it"
+            return "book not existing, you can add it"
   
-    def delete_book_details(self, author, title):
+    def delete_book_details(self, book_id):
         """removes the book details given a title and author"""
         for book in self.books_list:
-            if book['author'] == author:   
-                if book['title'] == title:
+            if book['book_id'] == book_id:   
                    self.books_list.remove(book)
                    self.total_books -= 1 
-                   return "deleted"
-                return "check the author details for spelling errors"
-            return "book does not exist"
+                   return "book deleted"
+            continue
+        return "book does not exist"
 
 
