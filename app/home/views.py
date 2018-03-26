@@ -1,8 +1,8 @@
 #app/home/views.py
 
-from flask import make_response,request,jsonify
+from flask import make_response,request,jsonify, session
 #local imports
-from app import user,admin_user
+from app import user as users,admin_user
 from . import home
 
 @home.route('/')
@@ -29,7 +29,7 @@ def register():
         email = details.get('email')
         password = details.get('password')
         confirm_pwd = details.get('confirm_pwd')
-        response = user.register(username,email,password,confirm_pwd)
+        response = users.register(username,email,password,confirm_pwd)
         if response == 'username exists choose another name!':    
            return make_response(jsonify(
                {'message':'username exists choose another name!'}
@@ -71,11 +71,14 @@ def login():
         details = request.get_json()
         email = details.get('email')
         password = details.get('password')
-        response = user.login(email,password)
+        response = users.login(email,password)
         if response == "succsefully logged in":
             return make_response(jsonify(
                 {'message':response}
             )), 200
+        for user in users.users_list:
+            if user['email'] == email:
+               session['email'] = email
         if response == "Inavlid username password":
             return make_response(jsonify(
                 {'message':response}
@@ -92,3 +95,21 @@ def get_books():
         return make_response(jsonify(
             {'books':res}
         )), 200
+
+@home.route('/api/v1/books/<book_id>',methods=['POST'])
+def borrow_book(book_id):
+    if request.method == 'POST':
+        author = request.json.get('author')
+        title = request.json.get('title')
+        publisher = request.json.get('publisher')
+        edition = request.json.get('edition')
+        for user in users.users_list:
+            if session['email'] != user['email']:
+               return make_response(jsonify(
+                   {'message':'you are not logged in'}
+               )), 403
+            response = users.borrow_book(author, title, publisher, edition, str(book_id))
+            return make_response(jsonify(
+                {'book borrowed':response}
+            )), 200
+          
