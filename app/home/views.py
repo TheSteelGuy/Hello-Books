@@ -17,12 +17,6 @@ def homepage():
 @home.route('/auth/api/v1/register',methods=['GET','POST'])
 def register():
     """method to handle register requests"""
-    if request.method == 'GET':
-        return make_response(jsonify(
-            {
-                'message':'welcome to the register endpoint, use autenticated post requests to register'
-            }
-        )), 200
     if request.method == 'POST':
         details = request.get_json()
         username = details.get('username')
@@ -33,11 +27,11 @@ def register():
         if response == 'username exists choose another name!':    
            return make_response(jsonify(
                {'message':'username exists choose another name!'}
-           )), 400
+           )), 409
         if response == "Email is already in use":    
            return make_response(jsonify(
                {'message':"Email is already in use"}
-           )), 400
+           )), 409
         if response == "Invalid email":    
            return make_response(jsonify(
                {'message':response}
@@ -54,39 +48,36 @@ def register():
            return make_response(jsonify(
                {'message':response}
            )), 400
-        if response == "registration succesfull":    
+        if response == "registration succesfull": 
+           session['email'] = email   
            return make_response(jsonify(
                {'message':response}
            )), 201
 
   
-@home.route('/auth/api/v1/login',methods=['GET','POST'])
+@home.route('/auth/api/v1/login',methods=['POST'])
 def login():
     """handles login requests"""
-    if request.method == 'GET':
-        return make_response(jsonify(
-            {'message':'welcome to the login endpoint'}
-        )), 200
     if request.method == 'POST':
         details = request.get_json()
         email = details.get('email')
         password = details.get('password')
         response = users.login(email,password)
         if response == "succsefully logged in":
+            session['email'] = email             
             return make_response(jsonify(
-                {'message':response}
+                {
+                    'message':response,
+                }
             )), 200
-        for user in users.users_list:
-            if user['email'] == email:
-               session['email'] = email
         if response == "Inavlid username password":
             return make_response(jsonify(
                 {'message':response}
-            )), 400
+            )), 401
         if response == "you have no account, register":
             return make_response(jsonify(
                 {'message':response}
-            )), 400
+            )), 404
             
 @home.route('/api/v1/books')
 def get_books():
@@ -96,20 +87,92 @@ def get_books():
             {'books':res}
         )), 200
 
-@home.route('/api/v1/books/<book_id>',methods=['POST'])
+@home.route('/api/v1/users/books/<book_id>',methods=['POST'])
 def borrow_book(book_id):
+    if not session.get('email'):
+        return make_response(jsonify(
+            {'message':'you are not logged in'}
+        )), 403
     if request.method == 'POST':
         author = request.json.get('author')
         title = request.json.get('title')
         publisher = request.json.get('publisher')
         edition = request.json.get('edition')
-        for user in users.users_list:
-            if session['email'] != user['email']:
-               return make_response(jsonify(
-                   {'message':'you are not logged in'}
-               )), 403
-            response = users.borrow_book(author, title, publisher, edition, str(book_id))
+        email = session['email']
+        response = users.borrow_book(author, title, publisher, edition,  email, str(book_id))
+        return make_response(jsonify(
+            {'book borrowed':response}
+        )), 200
+
+@home.route('/api/v1/users/<book_id>', methods=['POST'])
+def return_book(book_id):
+    """Allow a user to return a book borrowed"""
+    if not session.get('username'):
+        return make_response(jsonify(
+            {'message':'you are not logged in'}
+        )), 403
+    else:
+        if request.method == 'POST':
+            email = session['email']
+            response = users.return_book(str(book_id),email)
+            if response == "book returned":
+                return make_response(jsonify(
+                    {'message':response}
+                )), 200
+            else:
+                return make_response(jsonify(
+                    {'message':response}
+                )), 404
+
+@home.route('/api/v1/books/<book_id>')
+def retrieve_book_by_id(book_id):
+    """retrieves a book based on passed id"""
+    if request.method == 'GET':
+        response = admin_user.book_by_id(book_id)
+        return make_response(jsonify(
+            {'message':response}
+        )), 200
+
+@home.route('/api/v1/user/history')
+def show_my_borrowing(self):
+    """ shows a user borrowing history"""
+    if not session.get('email'):
+        return make_response(jsonify(
+            {'message':'you are not logged in'}
+        )), 403
+    else:
+        email = session['email']
+        response = users.user_borrowing_history(email)
+        if len(response) == 0:
             return make_response(jsonify(
-                {'book borrowed':response}
+                {'message':'no history to show'}
             )), 200
-          
+        else:
+            return make_response(jsonify(
+                {'borrowed books':response}
+            )), 200
+
+@home.route('/api/auth/logout')
+def logout():
+    if not session.get('email'):
+        return make_response(jsonify(
+            {'message':'you are not logged in'}
+        )), 403
+    if request.method == 'GET':
+        session.pop('email')
+        return make_response(jsonify(
+            {'message':'successfully logged out'}
+        )), 200
+    
+@home.route('/api/auth/reset-password', methods=['POST'])
+def reset_password():
+    """allowes user to reset password"""
+    if request.method == 'POST':
+       email = request.json.get('email')
+       new_password = request.json.get('new_password')
+       response = users.reset_password(email,new_password)
+       if response == 'password reset was succesfull':
+           return make_response(jsonify(
+               {'messaage':response}
+           )), 200
+
