@@ -1,5 +1,5 @@
 #directories/files not included in the repository
 #temporary python files
 *.pyc
-#any file ending with ~
+#any file ending with symbol ~
 *~
