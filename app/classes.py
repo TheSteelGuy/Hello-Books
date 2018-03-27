@@ -22,18 +22,18 @@ class Base(object):
             if book_details['category'] == category:
                 self.books_category_list.append(book_details)
                 return self.books_category_list
-            
-            return "no books in"+" " + str(category) +" " " are available"
+            continue
         return "no books by that category in the library"
+
     def filter_borrowed_books_by_user(self, email):
         """filters users borrowing per profile"""
-        for book_details in self.borrowed_books:
-            if book_details['email'] == email:
-                self.user_borrowed_books.append(book_details)
-                return self.user_borrowed_books
-            return "email does not exist"
-        return "there are no books in the library"
-
+        for borrow_details in self.borrowed_books:
+            if borrow_details['email'] == email:
+               self.user_borrowed_books.append(borrow_details)
+               return "filtered"
+            continue 
+        return "you have not borrowed any book"  
+ 
     def get_all_books(self):
         """ gets all books within the library"""
         for book in self.books_list:
@@ -48,7 +48,7 @@ class Base(object):
              borrowing_details for borrowing_details in self.borrowed_books if borrowing_details['email'] == email
             ]
         return user_borrowing_history
-
+        
 ######################################### USER CLASS ###############################################################
 class User(Base):
     """user class contains methods allowed for user object"""
@@ -93,7 +93,7 @@ class User(Base):
          return "you have no account, register"
 
     
-    def borrow_book(self, author, title, publisher, edition, book_id):
+    def borrow_book(self, author, title, publisher, edition, email, book_id):
         """handles borrowing of books by registered users"""
         for book in self.books_list:
             if book['book_id'] != str(book_id):
@@ -103,28 +103,34 @@ class User(Base):
                     'author' : author,
                     'title' : title,
                     'publisher' : publisher,
-                    'edition' : edition
+                    'edition' : edition,
+                    'email'   : email
                 }
                 self.borrowed_books.append(book)
                 return book
         
 
-    def return_book(self, author, title, email):
+    def return_book(self, email, book_id):
         """handles returning borrowed book"""
         books_borrowed = self.filter_borrowed_books_by_user(email)
         for book_details in books_borrowed:
-            if book_details['author'] == author:
-                if book_details['title'] == title:
-                    if book_details['edition']:
-                        self.user_borrowed_books.remove(book_details)
-                        return "book returned"
-                    return "inconsistent edition with the book title and author"
-                return "title does not match any author for any book"
-            return "book does not exist"
-        return "book does not exist in the category given"
-
+            if book_details['booK_id'] == str(book_id):
+                self.user_borrowed_books.remove(book_details)
+                return "book returned"
+            continue
+        return "book does not exist"
+    def reset_password(self, email,new_password):
+        """resets user password, if forgoten, 
+           user has to provide valid email
+        """
+        for user in self.users_list:
+            if user['email'] == email:
+                user['password'] = new_password
+                return 'password reset was succesfull'
+            continue
+        return "email provided does not match any user"
+        
 ############################################ ADMIN CLASS ############################################################## 
-
 class Admin(Base):
     """
     The admin class Contains methods that manage the site
@@ -179,7 +185,7 @@ class Admin(Base):
     def modify_book_details(self, new_author, new_title, new_publisher, new_edition, new_category, book_id):
         """updates book details"""
         for book_dict in self.books_list:
-            if book_dict['book_id'] == book_id: 
+            if book_dict['book_id'] == str(book_id): 
                    new_details=  {
                      'author' :new_author,
                      'title':new_title, 
@@ -200,5 +206,13 @@ class Admin(Base):
                    return "book deleted"
             continue
         return "book does not exist"
+
+    def book_by_id(self,book_id):
+        """ gets a abook when passed an id of that book"""
+        for book in self.books_list:
+            if book['book_id'] == str(book_id):
+                return book
+            continue
+        return "email provided does not match any user"
 
 
