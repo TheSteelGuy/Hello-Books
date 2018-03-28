@@ -8,10 +8,6 @@ from . import admin
 @admin.route('/auth/api/v1/admin/login', methods=['GET','POST'])
 def login():
     """logs the admin in"""
-    if request.method == 'GET':
-        return make_response(jsonify(
-            {'message':'only admins are allowed here'}
-        )), 200
     if request.method == 'POST':
        username = request.json.get('username')
        password = request.json.get('password')
@@ -21,13 +17,13 @@ def login():
            return make_response(jsonify(
                {
                    'message':'welcome admin',
-                   'session': session['username']
+                   'username': session['username']
                }
-           ))
+           )), 200
        else:
            return make_response(jsonify(
                {'message':response}
-           ))
+           )), 403
 
 @admin.route('/api/v1/books', methods=['POST'])
 def add_book():
@@ -35,7 +31,7 @@ def add_book():
     if not session.get('username'):
         return make_response(jsonify(
             {'message':'you are not logged in'}
-        )), 401
+        )), 403
     else:
        if request.method == 'POST':
            author = request.json.get('author')
@@ -47,7 +43,7 @@ def add_book():
            if response == "book with similar details exists":
                return make_response(jsonify(
                    {'message':response}
-               )), 400
+               )), 409
            if response == "book created":
               return make_response(jsonify(
                   {
@@ -81,6 +77,7 @@ def modify_book(book_id):
            return make_response(jsonify(
                {'message':response}
            )), 400
+
 @admin.route('/api/v1/books/<book_id>', methods=['DELETE'])
 def delete_book(book_id):
     """allows the admin to delete/remove book details"""
@@ -95,5 +92,18 @@ def delete_book(book_id):
                 return make_response(jsonify(
                     {'message':response}
                 )), 200
+        
+@admin.route('/api/auth/logout')
+def logout():
+    if not session.get('username'):
+        return make_response(jsonify(
+            {'message':'you are not logged in'}
+        )), 403
+    else:
+       if request.method == 'GET':
+           session.pop('email')
+           return make_response(jsonify(
+               {'message':'successfully logged out'}
+           )), 200
                 
 

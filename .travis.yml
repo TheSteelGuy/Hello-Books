@@ -5,10 +5,13 @@ python:
 install:
   - "pip install -r requirements.txt"
   - "pip install coveralls"
+notifications:
+  webhooks: https://coveralls.io/webhook?repo_token=9Ly8I0luviI24fcVw1WT3nosffrDhin9N
 
+script:
+- nosetests --with-coverage --cover-package=app 
 
 after_success:
-  coveralls
-script:
-- nosetests --with-coverage --cover-package=app && coverage report
+- coveralls
+
 

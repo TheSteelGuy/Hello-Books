@@ -76,8 +76,23 @@ class TestUser(TestBase):
     def test_user_borrow(self):
         """test if a user can borrow a book"""
         book_id = admin_user.books_list[0]['book_id']
-        borrow = user.borrow_book('testauthor','testtitle','testpublisher','tested',book_id)
+        email = user.users_list[0]['email']
+        borrow = user.borrow_book('testauthor','testtitle','testpublisher','tested', email, book_id)
         self.assertIn('author', borrow)
+       
+    def test_filter_by_email(self):
+        """test books filterin with email"""
+        email = user.users_list[0]['email']
+        book_id = admin_user.books_list[0]['book_id']
+        user.borrow_book('testauthor','testtitle','testpublisher','tested',email,book_id)
+        res = user.filter_borrowed_books_by_user(email)
+        self.assertEqual(res,'filtered')
+        
+    def test_getbookby_id(self):
+        'gets abook by an id'
+        book_id = admin_user.books_list[0]['book_id']  
+        book = admin_user.book_by_id(book_id)
+        self.assertIn('category',book) 
 
 class TestAdmin(TestBase):
     """tests admin methods"""
@@ -116,9 +131,10 @@ class TestAdmin(TestBase):
         admin_user.add_book('author2','testtitle2','testpublisher2','tested2','testcateg')
         admin_user.filter_books_by_category('testcateg')
         self.assertTrue(len(admin_user.books_list)==2)
+    
 
 
-        
+
         
 if __name__ == '__main__':
     unittest.main()
