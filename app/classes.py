@@ -150,14 +150,22 @@ class Admin(Base):
                 return "Inavlid username or password for admin"
             return "you are not an admin"
     
-    def reset_default_password(self,username, password, new_username, new_pwd):
+    def reset_default_password(self,username,new_username,password,new_pwd,email):
         """reset the admin credetials from default values"""
         for admin_dict in self.admin_list:
             if admin_dict['username'] != username:
                 return "wrong username"
             if admin_dict['password'] != password:
                 return 'wrong password'
-
+            else:
+                new_details ={
+                    'username':new_username,
+                    'password':new_pwd,
+                    'email':email
+                }
+                del self.admin_list[0]
+                self.admin_list.append(new_details)
+                return 'admin details updated'
 
     def get_all_users(self):
         """users who have registered"""
