@@ -40,6 +40,10 @@ def add_book():
            edition = request.json.get('edition')
            category = request.json.get('category')
            response = admin_user.add_book(author, title, publisher, edition, category)
+           if author.strip() or title.strip() or publisher.strip() or edition.strip() or category.strip() == " ":
+              return make_response(jsonify(
+                  {'message':'no empty inputs allowed'}
+              )), 409
            if response == "book with similar details exists":
                return make_response(jsonify(
                    {'message':response}
@@ -69,6 +73,10 @@ def modify_book(book_id):
            publisher = request.json.get('new_publisher')
            edition = request.json.get('new_edition')
            category = request.json.get('new_category')
+           if author.strip() or title.strip() or publisher.strip() or edition.strip() or category.strip() == " ":
+              return make_response(jsonify(
+                  {'message':'no empty inputs allowed'}
+              )), 409
            response = admin_user.modify_book_details(author, title, publisher, edition, category, str(book_id))
            if response == "book details updated":
                return make_response(jsonify(
@@ -93,7 +101,7 @@ def delete_book(book_id):
                     {'message':response}
                 )), 200
         
-@admin.route('/api/auth/logout')
+@admin.route('/api/v1/auth/logout')
 def logout():
     if not session.get('username'):
         return make_response(jsonify(
@@ -105,5 +113,27 @@ def logout():
            return make_response(jsonify(
                {'message':'successfully logged out'}
            )), 200
+
+@admin.route('/api/auth/')
+def reset_default_password():
+    """
+    allowes admin to reset the default credentials
+    from username :admin and password:admin12
+    """
+    if request.method == 'POST':
+       username = request.json.get('username')
+       new_username = request.json.get('new_username')
+       password = request.json.get('new_password')
+       new_pwd = request.json.get('new_password')
+       email = request.json.get('admin-email')
+       response = admin_user.reset_default_password(username,new_username,password,new_pwd,email)
+       if response == 'admin details updated': 
+           return make_response(jsonify(
+               {'messaage':response}
+           )), 200
+       else:
+            return make_response(jsonify(
+                {'message':'unable to reset your credentials, check the default values and try again'}
+            ))
                 
 
