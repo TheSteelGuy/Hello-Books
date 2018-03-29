@@ -8,8 +8,8 @@
 from flask import Flask
 #local imports
 from app.config import app_config
-from  classes import User
-from classes import Admin
+from  models.user import User
+from models.admin import Admin
 
 user = User()
 admin_user = Admin()

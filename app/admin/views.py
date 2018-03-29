@@ -1,6 +1,7 @@
 #app/admin/views.py
 
 from flask import make_response, request, jsonify, session
+import re
 #local imports
 from app import user, admin_user
 from . import admin
@@ -12,6 +13,11 @@ def login():
        username = request.json.get('username')
        password = request.json.get('password')
        response = admin_user.login(username, password)
+       if username.strip() or password.strip() == " ":
+           return make_response(jsonify(
+               {'message':'username or password cannot be empty'}
+           )), 403
+       
        if response == "succsefully logged in":
            session['username'] = username
            return make_response(jsonify(
@@ -44,6 +50,15 @@ def add_book():
               return make_response(jsonify(
                   {'message':'no empty inputs allowed'}
               )), 409
+           if author.isdigit() or title.isdigit() or publisher.isdigit() or category.isdigit():
+              return make_response(jsonify(
+                  {'message':'book details must be alphabet'}
+              )), 409   
+           if not re.findall(r'(^[A-Za-z]+\s[A-Za-z]+$)', author):
+              return make_response(jsonify(
+                  {'message':'author must be in form of Evalyn James'}
+              )), 409  
+           
            if response == "book with similar details exists":
                return make_response(jsonify(
                    {'message':response}
@@ -77,6 +92,14 @@ def modify_book(book_id):
               return make_response(jsonify(
                   {'message':'no empty inputs allowed'}
               )), 409
+           if author.isdigit() or title.isdigit() or publisher.isdigit() or category.isdigit():
+              return make_response(jsonify(
+                  {'message':'book details must be alphabet'}
+              )), 409   
+           if not re.findall(r'(^[A-Za-z]+\s[A-Za-z]+$)', author):
+              return make_response(jsonify(
+                  {'message':'author must be in form of Evalyn James'}
+              )), 409 
            response = admin_user.modify_book_details(author, title, publisher, edition, category, str(book_id))
            if response == "book details updated":
                return make_response(jsonify(
@@ -123,9 +146,17 @@ def reset_default_password():
     if request.method == 'POST':
        username = request.json.get('username')
        new_username = request.json.get('new_username')
-       password = request.json.get('new_password')
+       password = request.json.get('password')
        new_pwd = request.json.get('new_password')
-       email = request.json.get('admin-email')
+       email = request.json.get('admin_email')
+       if new_username.strip() or new_pwd.strip():
+            return make_response(jsonify(
+                {'message':'new username or password cannot be empty'}
+            )), 409
+       if not re.findall(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):  
+           return make_response(jsonify(
+               {'messaage':'Invalid email'}
+           )), 200                
        response = admin_user.reset_default_password(username,new_username,password,new_pwd,email)
        if response == 'admin details updated': 
            return make_response(jsonify(

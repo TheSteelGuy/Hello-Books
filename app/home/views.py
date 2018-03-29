@@ -1,9 +1,11 @@
 #app/home/views.py
 
 from flask import make_response,request,jsonify, session
+import re
 #local imports
 from app import user as users,admin_user
 from . import home
+
 
 @home.route('/')
 def homepage():
@@ -99,6 +101,19 @@ def borrow_book(book_id):
         publisher = request.json.get('publisher')
         edition = request.json.get('edition')
         email = session['email']
+        if author.strip() or title.strip() or publisher.strip() or edition.strip() == " ":
+           return make_response(jsonify(
+               {'message':'no empty inputs allowed'}
+           )), 409
+        if author.isdigit() or title.isdigit() or publisher.isdigit():
+           return make_response(jsonify(
+               {'message':'book details must be alphabet'}
+           )), 409   
+        if not re.findall(r'(^[A-Za-z]+\s[A-Za-z]+$)', author):
+           return make_response(jsonify(
+               {'message':'author must be in form of Evalyn James'}
+           )), 409  
+           
         response = users.borrow_book(author, title, publisher, edition,  email, str(book_id))
         return make_response(jsonify(
             {'book borrowed':response}
