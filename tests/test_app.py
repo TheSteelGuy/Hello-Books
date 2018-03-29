@@ -130,12 +130,7 @@ class TestAdmin(TestBase):
         """test category"""
         admin_user.add_book('author2','testtitle2','testpublisher2','tested2','testcateg')
         admin_user.filter_books_by_category('testcateg')
-        self.assertTrue(len(admin_user.books_list)==2)
-    
-    def test_reset_admin_defaults(self)
-        """tests if an admin can change the default credentials"""
-        
-
+        self.assertTrue(len(admin_user.books_list)==2)        
 
         
 if __name__ == '__main__':
