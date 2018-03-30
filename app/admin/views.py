@@ -6,18 +6,13 @@ import re
 from app import user, admin_user
 from . import admin
 
-@admin.route('/auth/api/v1/admin/login', methods=['GET','POST'])
+@admin.route('/auth/api/v1/admin/login', methods=['POST'])
 def login():
     """logs the admin in"""
     if request.method == 'POST':
        username = request.json.get('username')
        password = request.json.get('password')
        response = admin_user.login(username, password)
-       if username.strip() or password.strip() == " ":
-           return make_response(jsonify(
-               {'message':'username or password cannot be empty'}
-           )), 403
-       
        if response == "succsefully logged in":
            session['username'] = username
            return make_response(jsonify(
@@ -46,7 +41,7 @@ def add_book():
            edition = request.json.get('edition')
            category = request.json.get('category')
            response = admin_user.add_book(author, title, publisher, edition, category)
-           if author.strip() or title.strip() or publisher.strip() or edition.strip() or category.strip() == " ":
+           if len(author) == 0 or len(title) == 0 or len(publisher) == 0 or len(edition) == 0 or len(category) == 0:
               return make_response(jsonify(
                   {'message':'no empty inputs allowed'}
               )), 409
@@ -88,7 +83,7 @@ def modify_book(book_id):
            publisher = request.json.get('new_publisher')
            edition = request.json.get('new_edition')
            category = request.json.get('new_category')
-           if author.strip() or title.strip() or publisher.strip() or edition.strip() or category.strip() == " ":
+           if len(title) == 0 or len(publisher) == 0 or len(edition) == 0 or len(category) == 0:
               return make_response(jsonify(
                   {'message':'no empty inputs allowed'}
               )), 409
@@ -149,7 +144,7 @@ def reset_default_password():
        password = request.json.get('password')
        new_pwd = request.json.get('new_password')
        email = request.json.get('admin_email')
-       if new_username.strip() or new_pwd.strip():
+       if len(new_username) < 4 or len(new_pwd) < 4:
             return make_response(jsonify(
                 {'message':'new username or password cannot be empty'}
             )), 409

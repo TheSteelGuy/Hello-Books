@@ -52,6 +52,7 @@ class Admin(Base):
         for book in self.books_list:
              if book['title'] == title and book['author'] == author:
                 return "book with similar details exists"
+             continue
         else:
            book_dict['author'] = author 
            book_dict['title'] = title
@@ -77,7 +78,8 @@ class Admin(Base):
                    }
                    book_dict.update(new_details)
                    return "book details updated"
-            return "book not existing, you can add it"
+            continue
+        return "book not existing, you can add it"
   
     def delete_book_details(self, book_id):
         """removes the book details given a title and author"""

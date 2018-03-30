@@ -24,7 +24,7 @@ class User(Base):
     
         if len(password) < 3:
           return "password length should be more than 3 characters"
-        if username.strip() == "" or not username.isalpha():
+        if len(username) == 0 or not username.isalpha():
           return  "username cannot be empty, or non alphabet"
         if password != confirm_pwd:
          return "password does not match"
@@ -42,8 +42,8 @@ class User(Base):
              if email == user['email']:
                 if password == user['password']:
                    return "succsefully logged in"
-             
                 return "Inavlid username password"
+             continue
          return "you have no account, register"
 
     
@@ -52,6 +52,7 @@ class User(Base):
         for book in self.books_list:
             if book['book_id'] != str(book_id):
                return 'book does not exist'
+            continue
         else: 
                 book = {
                     'author' : author,
