@@ -16,7 +16,7 @@ def homepage():
         }
     )), 200
 
-@home.route('/auth/api/v1/register',methods=['GET','POST'])
+@home.route('/auth/api/v1/register',methods=['POST'])
 def register():
     """method to handle register requests"""
     if request.method == 'POST':
@@ -85,6 +85,11 @@ def login():
 def get_books():
     if request.method == 'GET':
         res = admin_user.books_list
+        if len(res) == 0:
+           return make_response(jsonify(
+               {'message':'no books to show'}
+           )), 200
+            
         return make_response(jsonify(
             {'books':res}
         )), 200
@@ -94,14 +99,18 @@ def borrow_book(book_id):
     if not session.get('email'):
         return make_response(jsonify(
             {'message':'you are not logged in'}
-        )), 403
+        )), 403        
+        return make_response(jsonify(
+            {'books':res}
+        )), 200
+
     if request.method == 'POST':
         author = request.json.get('author')
         title = request.json.get('title')
         publisher = request.json.get('publisher')
         edition = request.json.get('edition')
         email = session['email']
-        if author.strip() or title.strip() or publisher.strip() or edition.strip() == " ":
+        if len(title) == 0 or len(publisher) == 0 or len(edition) == 0:
            return make_response(jsonify(
                {'message':'no empty inputs allowed'}
            )), 409
@@ -190,4 +199,5 @@ def reset_password():
            return make_response(jsonify(
                {'messaage':response}
            )), 200
+        
 

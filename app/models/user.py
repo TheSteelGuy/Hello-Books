@@ -1,8 +1,9 @@
 #app/user.py
 #coding:"utf-8"
 
-from base import Base
+from .base import Base
 import re
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(Base):
     """user class contains methods allowed for user object"""
@@ -10,6 +11,10 @@ class User(Base):
         """person constructor"""
         Base.__init__(self)
         self.is_admin = False
+
+    def verify_password(self,password):
+         """verify password against the  password hash"""
+         return check_password_hash(self.password_hash,password)
 
     def register(self, username, email, password, confirm_pwd):
         """ Registration"""
@@ -24,14 +29,15 @@ class User(Base):
     
         if len(password) < 3:
           return "password length should be more than 3 characters"
-        if username.strip() == "" or not username.isalpha():
+        if len(username) == 0 or not username.isalpha():
           return  "username cannot be empty, or non alphabet"
         if password != confirm_pwd:
          return "password does not match"
         else:
+           self.password_hash = generate_password_hash(password)
            registration_dict['username'] = username
            registration_dict['email']  = email
-           registration_dict['password'] = password
+           registration_dict['password'] = self.password_hash
            registration_dict['is_admin'] = self.is_admin
            self.users_list.append(registration_dict)
            return "registration succesfull"
@@ -40,10 +46,10 @@ class User(Base):
          """login method"""
          for user in self.users_list:
              if email == user['email']:
-                if password == user['password']:
+                if self.verify_password(password):
                    return "succsefully logged in"
-             
                 return "Inavlid username password"
+             continue
          return "you have no account, register"
 
     
@@ -52,6 +58,7 @@ class User(Base):
         for book in self.books_list:
             if book['book_id'] != str(book_id):
                return 'book does not exist'
+            continue
         else: 
                 book = {
                     'author' : author,
