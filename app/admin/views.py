@@ -117,7 +117,7 @@ def delete_book(book_id):
             if response == "book deleted":
                 return make_response(jsonify(
                     {'message':response}
-                )), 200
+                )), 204
         
 @admin.route('/api/v1/auth/logout')
 def logout():
@@ -132,7 +132,7 @@ def logout():
                {'message':'successfully logged out'}
            )), 200
 
-@admin.route('/api/auth/')
+@admin.route('/api/auth/reset', methods=['POST'])
 def reset_default_password():
     """
     allowes admin to reset the default credentials
