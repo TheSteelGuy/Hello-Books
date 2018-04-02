@@ -69,7 +69,7 @@ class User(Base):
         """handles returning borrowed book"""
         books_borrowed = self.filter_borrowed_books_by_user(email)
         for book_details in books_borrowed:
-            if book_details['booK_id'] == str(book_id):
+            if book_details['book_id'] == str(book_id):
                 self.user_borrowed_books.remove(book_details)
                 return "book returned"
             continue
