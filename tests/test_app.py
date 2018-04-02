@@ -23,7 +23,7 @@ class TestBase(TestCase):
 
 
     def tearDown(self):
-        admin_user.users_list = list()
+        user.users_list = list()
         admin_user.books_list = list()
         admin_user.books_category_list = []
         admin_user.borrowed_books = []
@@ -79,6 +79,7 @@ class TestUser(TestBase):
         email = user.users_list[0]['email']
         borrow = user.borrow_book('testauthor','testtitle','testpublisher','tested', email, book_id)
         self.assertIn('author', borrow)
+
        
     def test_filter_by_email(self):
         """test books filterin with email"""
@@ -93,6 +94,13 @@ class TestUser(TestBase):
         book_id = admin_user.books_list[0]['book_id']  
         book = admin_user.book_by_id(book_id)
         self.assertIn('category',book) 
+
+    def test_reset_password(self):
+        """tests user can rest their password"""
+        email = user.users_list[0]['email']
+        new = user.reset_password(email,'mynewpwd')
+        self.assertEqual(new,'password reset was succesfull')
+
 
 class TestAdmin(TestBase):
     """tests admin methods"""
@@ -130,7 +138,8 @@ class TestAdmin(TestBase):
         """test category"""
         admin_user.add_book('author2','testtitle2','testpublisher2','tested2','testcateg')
         admin_user.filter_books_by_category('testcateg')
-        self.assertTrue(len(admin_user.books_list)==2)        
+        self.assertTrue(len(admin_user.books_list)==2)   
+
 
         
 if __name__ == '__main__':

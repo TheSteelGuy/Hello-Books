@@ -101,7 +101,7 @@ def borrow_book(book_id):
         publisher = request.json.get('publisher')
         edition = request.json.get('edition')
         email = session['email']
-        if author.strip() or title.strip() or publisher.strip() or edition.strip() == " ":
+        if len(title) == 0 or len(publisher) == 0 or len(edition) == 0:
            return make_response(jsonify(
                {'message':'no empty inputs allowed'}
            )), 409
@@ -189,5 +189,6 @@ def reset_password():
        if response == 'password reset was succesfull':
            return make_response(jsonify(
                {'messaage':response}
-           )), 200
+           )), 200 
+        
 
