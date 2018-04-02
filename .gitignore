@@ -3,3 +3,9 @@
 *.pyc
 #any file ending with symbol ~
 *~
+#file of type cache
+*__pycache__
+#directory of type cache
+__pycache__
+#migrations
+migrations
