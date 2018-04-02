@@ -1,4 +1,3 @@
-[![Coverage Status](https://coveralls.io/repos/github/TheSteelGuy/Hello-Books/badge.svg?branch=master)](https://coveralls.io/github/TheSteelGuy/Hello-Books?branch=master)
 [![Build Status](https://travis-ci.org/TheSteelGuy/Hello-Books.svg?branch=develop2)](https://travis-ci.org/TheSteelGuy/Hello-Books)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/963b33c3b1594047b966da05c5bb4d31)](https://www.codacy.com/app/TheSteelGuy/Hello-Books?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TheSteelGuy/Hello-Books&amp;utm_campaign=Badge_Grade)
 
