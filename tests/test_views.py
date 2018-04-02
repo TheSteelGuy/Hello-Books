@@ -18,7 +18,12 @@ class TestBase(TestCase):
     
     def setUp(self):
         """ gets run before any test"""
-        self.admin = admin_user.add_book('testauthor','testtitle','testpublisher','tested','testcateg')
+        self.book = {
+            'author':'testauthor',
+            'title':'testtitle',
+            'publisher':'testpublisher',
+            'edition':'tested',
+            'category':'testcateg'}
         self.user_ = {
             'username':'testuserone',
             'email':'testemail1@gmail.com',
@@ -72,7 +77,44 @@ class TestHomeViews(TestBase):
         res = self.client.get(
             '/api/v1/books'
         )
-        self.assertIn('col' and 'testauthor', res.data)
+        self.assertEqual(200, res.status_code)
+
+    def test_add_book(self):
+        """tests if admin can add book with no logging in"""
+        response = self.client.post(
+            '/api/v1/users/books',
+            data = json.dumps(self.book),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code,403)
+    
+    def test_borrow(self):
+        """tests if a user can borrow book without authentication"""
+        admin_user.add_book('col','test1','testpublisher1','tested','testcateg')
+        book_id = admin_user.books_list[0]['book_id']
+        book = {
+            'author':'col',
+            'title':'test1',
+            'publisher':'testpublisher1',
+            'edition':'tested',
+            'category':'testcateg'}
+        response = self.client.post(
+            '/api/v1/users/books/<book_id>',
+            data = json.dumps(book),
+            content_type='application/json')
+
+        self.assertEqual(response.status_code,403)
+
+    def test_return_book(self):
+        """tests returing of book with no login"""
+        admin_user.add_book('col','test1','testpublisher1','tested','testcateg')
+        book_id = admin_user.books_list[0]['book_id']
+        user.borrow_book('col','test1','testpublisher1','tested','testcateg',book_id)
+        response = self.client.post(
+            '/api/v1/users/books/<book_id>',
+            data = json.dumps(book_id),
+            content_type='application/json')
+        self.assertEqual(response.status_code,403)
         
 if __name__ == '__main__':
     unittest.main()
