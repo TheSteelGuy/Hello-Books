@@ -189,6 +189,6 @@ def reset_password():
        if response == 'password reset was succesfull':
            return make_response(jsonify(
                {'messaage':response}
-           )), 200
+           )), 200 
         
 
