@@ -8,6 +8,7 @@ import json
 #local import
 from app import user,admin_user,create_app
 
+
 class TestBase(TestCase):
     """ common class"""
     def create_app(self):
@@ -115,6 +116,7 @@ class TestAdminViews(TestBase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code,401)
+
         
 if __name__ == '__main__':
     unittest.main()

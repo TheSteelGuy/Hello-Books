@@ -22,46 +22,52 @@ def homepage():
 def register():
     """method to handle register requests"""
     if request.method == 'POST':
-        details = request.get_json()
-        username = details.get('username')
-        email = details.get('email')
-        password = details.get('password')
-        confirm_pwd = details.get('confirm_pwd')
-        response = users.register(username,email,password,confirm_pwd)
-        if response == 'username exists choose another name!':    
-           return make_response(jsonify(
-               {'message':'username exists choose another name!'}
-           )), 409
-        if response == "Email is already in use":    
-           return make_response(jsonify(
-               {'message':"Email is already in use"}
-           )), 409
-        if response == "Invalid email":    
-           return make_response(jsonify(
-               {'message':response}
-           )), 400
-        if response == "password length should be more than 3 characters":    
-           return make_response(jsonify(
-               {'message':response}
-           )), 400
-        if response == "username cannot be empty, or non alphabet":    
-           return make_response(jsonify(
-               {'message':response}
-           )), 400
-        if response == "password does not match":    
-           return make_response(jsonify(
-               {'message':response}
-           )), 400
-        if response == "registration succesfull": 
-           access_token = create_access_token(identity=email)  
-           return make_response(jsonify(
-               {
-                   'message':response,
-                   'token': access_token
-               }
-           )), 201
+        try:
 
-  
+            details = request.get_json()
+            username = details.get('username')
+            email = details.get('email')
+            password = details.get('password')
+            confirm_pwd = details.get('confirm_pwd')
+            response = users.register(username,email,password,confirm_pwd)
+            if response == 'username exists choose another name!':    
+               return make_response(jsonify(
+                   {'message':'username exists choose another name!'}
+               )), 409
+            if response == "Email is already in use":    
+               return make_response(jsonify(
+                   {'message':"Email is already in use"}
+               )), 409
+            if response == "Invalid email":    
+               return make_response(jsonify(
+                   {'message':response}
+               )), 400
+            if response == "password length should be more than 3 characters":    
+               return make_response(jsonify(
+                   {'message':response}
+               )), 400
+            if response == "username cannot be empty, or non alphabet":    
+               return make_response(jsonify(
+                   {'message':response}
+               )), 400
+            if response == "password does not match":    
+               return make_response(jsonify(
+                   {'message':response}
+               )), 400
+            if response == "registration succesfull": 
+               access_token = create_access_token(identity=email)  
+               return make_response(jsonify(
+                   {
+                       'message':response,
+                       'token': access_token
+                   }
+               )), 201
+        except Exception as e:
+            return make_response(jsonify(
+                {'message':e}
+            ))
+    
+    
 @user.route('/auth/api/v1/login',methods=['POST'])
 def login():
     """handles login requests"""
@@ -104,10 +110,10 @@ def get_books():
 @jwt_required
 def borrow_book(book_id):
     if request.method == 'POST':
-        """ #author = request.json.get('author')
-        #title = request.json.get('title')
-        #publisher = request.json.get('publisher')
-        #edition = request.json.get('edition')
+        author = request.json.get('author')
+        title = request.json.get('title')
+        publisher = request.json.get('publisher')
+        edition = request.json.get('edition')
         if len(title) == 0 or len(publisher) == 0 or len(edition) == 0:
            return make_response(jsonify(
                {'message':'no empty inputs allowed'}
@@ -119,9 +125,9 @@ def borrow_book(book_id):
         if not re.findall(r'(^[A-Za-z]+\s[A-Za-z]+$)', author):
            return make_response(jsonify(
                {'message':'author must be in form of Evalyn James'}
-           )), 409  """
+           )), 409  
            
-        response = users.borrow_book(str(book_id))
+        response = users.borrow_book(author, title, publisher, edition)
         return make_response(jsonify(
             {'book borrowed':response}
         )), 200
