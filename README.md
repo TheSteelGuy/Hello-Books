@@ -1,4 +1,8 @@
 
+[![Build Status](https://travis-ci.org/TheSteelGuy/Hello-Books.svg?branch=curdevelop)](https://travis-ci.org/TheSteelGuy/Hello-Books)
+[![Coverage Status](https://coveralls.io/repos/github/TheSteelGuy/Hello-Books/badge.svg?branch=curdevelop)](https://coveralls.io/github/TheSteelGuy/Hello-Books?branch=curdevelop)
+
+
 # Hello-Books app
 
 ### Introduction
