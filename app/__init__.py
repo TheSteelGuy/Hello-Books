@@ -7,6 +7,7 @@
 #third party imports
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from datetime import timedelta
 import os
 #local imports
 from app.config import app_config
@@ -22,6 +23,10 @@ def create_app(config_name):
     app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
     app.config['JWT_SECRET_KEY'] = os.urandom(10) 
     app.config.from_object(app_config[config_name])
+    ACCESS_EXPIRES = timedelta(minutes=15)
+    REFRESH_EXPIRES = timedelta(days=10)
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = ACCESS_EXPIRES
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = REFRESH_EXPIRES
     jwt = JWTManager(app)
     from .admin import admin as admin_blueprint
     from .user import user as user_blueprint
