@@ -1,13 +1,14 @@
 #app/home/views.py
 
-from flask import make_response,request,jsonify, session
+from flask import make_response,request,jsonify
+from flask_jwt_extended import jwt_required, create_access_token,get_jwt_identity
 import re
 #local imports
-from app import user as users,admin_user
-from . import home
+from app import user_object as users,admin_user
+from . import user
 
 
-@home.route('/')
+@user.route('/')
 def homepage():
     """get requests for homepage"""
     return make_response(jsonify(
@@ -16,7 +17,8 @@ def homepage():
         }
     )), 200
 
-@home.route('/auth/api/v1/register',methods=['GET','POST'])
+
+@user.route('/auth/api/v1/register',methods=['POST'])
 def register():
     """method to handle register requests"""
     if request.method == 'POST':
@@ -51,13 +53,16 @@ def register():
                {'message':response}
            )), 400
         if response == "registration succesfull": 
-           session['email'] = email   
+           access_token = create_access_token(identity=email)  
            return make_response(jsonify(
-               {'message':response}
+               {
+                   'message':response,
+                   'token': access_token
+               }
            )), 201
 
   
-@home.route('/auth/api/v1/login',methods=['POST'])
+@user.route('/auth/api/v1/login',methods=['POST'])
 def login():
     """handles login requests"""
     if request.method == 'POST':
@@ -66,10 +71,11 @@ def login():
         password = details.get('password')
         response = users.login(email,password)
         if response == "succsefully logged in":
-            session['email'] = email             
+            access_token = create_access_token(identity=email)            
             return make_response(jsonify(
                 {
                     'message':response,
+                    'token':access_token
                 }
             )), 200
         if response == "Inavlid username password":
@@ -81,26 +87,27 @@ def login():
                 {'message':response}
             )), 404
             
-@home.route('/api/v1/books')
+@user.route('/api/v1/books')
 def get_books():
     if request.method == 'GET':
         res = admin_user.books_list
+        if len(res) == 0:
+           return make_response(jsonify(
+               {'message':'no books to show'}
+           )), 200
+            
         return make_response(jsonify(
             {'books':res}
         )), 200
 
-@home.route('/api/v1/users/books/<book_id>',methods=['POST'])
+@user.route('/api/v1/users/books/<book_id>',methods=['POST'])
+@jwt_required
 def borrow_book(book_id):
-    if not session.get('email'):
-        return make_response(jsonify(
-            {'message':'you are not logged in'}
-        )), 403
     if request.method == 'POST':
-        author = request.json.get('author')
-        title = request.json.get('title')
-        publisher = request.json.get('publisher')
-        edition = request.json.get('edition')
-        email = session['email']
+        """ #author = request.json.get('author')
+        #title = request.json.get('title')
+        #publisher = request.json.get('publisher')
+        #edition = request.json.get('edition')
         if len(title) == 0 or len(publisher) == 0 or len(edition) == 0:
            return make_response(jsonify(
                {'message':'no empty inputs allowed'}
@@ -112,34 +119,29 @@ def borrow_book(book_id):
         if not re.findall(r'(^[A-Za-z]+\s[A-Za-z]+$)', author):
            return make_response(jsonify(
                {'message':'author must be in form of Evalyn James'}
-           )), 409  
+           )), 409  """
            
-        response = users.borrow_book(author, title, publisher, edition,  email, str(book_id))
+        response = users.borrow_book(str(book_id))
         return make_response(jsonify(
             {'book borrowed':response}
         )), 200
 
-@home.route('/api/v1/users/<book_id>', methods=['POST'])
+@user.route('/api/v1/users/<book_id>', methods=['POST'])
 def return_book(book_id):
     """Allow a user to return a book borrowed"""
-    if not session.get('username'):
-        return make_response(jsonify(
-            {'message':'you are not logged in'}
-        )), 403
-    else:
-        if request.method == 'POST':
-            email = session['email']
-            response = users.return_book(str(book_id),email)
-            if response == "book returned":
-                return make_response(jsonify(
-                    {'message':response}
-                )), 200
-            else:
-                return make_response(jsonify(
-                    {'message':response}
-                )), 404
+    if request.method == 'POST':
+        response = users.return_book(str(book_id))
+        if response == "book returned":
+            return make_response(jsonify(
+                {'message':response}
+            )), 200
+        else:
+            return make_response(jsonify(
+                {'message':response}
+            )), 404
 
-@home.route('/api/v1/books/<book_id>')
+            
+@user.route('/api/v1/books/<book_id>')
 def retrieve_book_by_id(book_id):
     """retrieves a book based on passed id"""
     if request.method == 'GET':
@@ -148,7 +150,7 @@ def retrieve_book_by_id(book_id):
             {'message':response}
         )), 200
 
-@home.route('/api/v1/user/history')
+@user.route('/api/v1/user/history')
 def show_my_borrowing(self):
     """ shows a user borrowing history"""
     if not session.get('email'):
@@ -167,7 +169,7 @@ def show_my_borrowing(self):
                 {'borrowed books':response}
             )), 200
 
-@home.route('/api/auth/logout')
+@user.route('/api/auth/logout')
 def logout():
     if not session.get('email'):
         return make_response(jsonify(
@@ -179,7 +181,7 @@ def logout():
             {'message':'successfully logged out'}
         )), 200
     
-@home.route('/api/auth/reset-password', methods=['POST'])
+@user.route('/api/auth/reset-password', methods=['POST'])
 def reset_password():
     """allowes user to reset password"""
     if request.method == 'POST':

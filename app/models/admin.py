@@ -1,7 +1,7 @@
 #app/user.py
 #coding:"utf-8"
 
-from base import Base
+from .base import Base
 from datetime import date
 import uuid
 

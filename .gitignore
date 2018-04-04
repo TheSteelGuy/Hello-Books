@@ -3,3 +3,5 @@
 *.pyc
 #any file ending with symbol ~
 *~
+*_pycache__
+/_pycache__

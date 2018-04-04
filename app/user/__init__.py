@@ -3,7 +3,7 @@
 
 from flask import Blueprint
 
-home = Blueprint('home',__name__)
+user = Blueprint('user',__name__)
 
 from . import views
 

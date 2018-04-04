@@ -6,7 +6,7 @@ from flask_testing import TestCase
 import unittest
 import json
 #local import
-from app import user,admin_user,create_app
+from app import user_object as user,admin_user,create_app
 
 class TestBase(TestCase):
     """ common class"""
@@ -75,18 +75,8 @@ class TestUser(TestBase):
         
     def test_user_borrow(self):
         """test if a user can borrow a book"""
-        book_id = admin_user.books_list[0]['book_id']
-        email = user.users_list[0]['email']
-        borrow = user.borrow_book('testauthor','testtitle','testpublisher','tested', email, book_id)
-        self.assertIn('author', borrow)
-       
-    def test_filter_by_email(self):
-        """test books filterin with email"""
-        email = user.users_list[0]['email']
-        book_id = admin_user.books_list[0]['book_id']
-        user.borrow_book('testauthor','testtitle','testpublisher','tested',email,book_id)
-        res = user.filter_borrowed_books_by_user(email)
-        self.assertEqual(res,'filtered')
+        borrow = user.borrow_book('testauthor','testtitle','testpublisher','tested')
+        self.assertEqual(len(borrow), 5)
         
     def test_getbookby_id(self):
         'gets abook by an id'
@@ -126,11 +116,7 @@ class TestAdmin(TestBase):
         delete = admin_user.delete_book_details(book_id)
         self.assertEqual(delete,'book does not exist')
     
-    def test_filter_by_category(self):
-        """test category"""
-        admin_user.add_book('author2','testtitle2','testpublisher2','tested2','testcateg')
-        admin_user.filter_books_by_category('testcateg')
-        self.assertTrue(len(admin_user.books_list)==2)        
+    
 
         
 if __name__ == '__main__':

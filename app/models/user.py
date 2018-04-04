@@ -1,8 +1,9 @@
 #app/user.py
 #coding:"utf-8"
 
-from base import Base
+from .base import Base
 import re
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(Base):
     """user class contains methods allowed for user object"""
@@ -10,6 +11,10 @@ class User(Base):
         """person constructor"""
         Base.__init__(self)
         self.is_admin = False
+    
+    def verify_password(self,password):
+         """verify password against the  password hash"""
+         return check_password_hash(self.password_hash,password)
 
     def register(self, username, email, password, confirm_pwd):
         """ Registration"""
@@ -29,9 +34,10 @@ class User(Base):
         if password != confirm_pwd:
          return "password does not match"
         else:
+           self.password_hash = generate_password_hash(password)
            registration_dict['username'] = username
            registration_dict['email']  = email
-           registration_dict['password'] = password
+           registration_dict['password'] = self.password_hash
            registration_dict['is_admin'] = self.is_admin
            self.users_list.append(registration_dict)
            return "registration succesfull"
@@ -40,40 +46,29 @@ class User(Base):
          """login method"""
          for user in self.users_list:
              if email == user['email']:
-                if password == user['password']:
+                if self.verify_password(password):
                    return "succsefully logged in"
                 return "Inavlid username password"
              continue
          return "you have no account, register"
 
     
-    def borrow_book(self, author, title, publisher, edition, email, book_id):
-        """handles borrowing of books by registered users"""
+    def borrow_book(self, author, title, publisher, edition):
+        """ creates a book which does not exist"""
+        book_dict = dict()   
         for book in self.books_list:
-            if book['book_id'] != str(book_id):
-               return 'book does not exist'
-            continue
-        else: 
-                book = {
-                    'author' : author,
-                    'title' : title,
-                    'publisher' : publisher,
-                    'edition' : edition,
-                    'email'   : email
-                }
-                self.borrowed_books.append(book)
-                return book
-        
+             if book['title'] == title and book['author'] == author:
+                return "book with similar details exists"
+             continue
+        else:
+           book_dict['author'] = author 
+           book_dict['title'] = title
+           book_dict['publisher'] = publisher
+           book_dict['edition'] = edition
+           book_dict['id_'] = len(self.books_list)
+           self.borrowed_books.append(book_dict)
+           return book_dict 
 
-    def return_book(self, email, book_id):
-        """handles returning borrowed book"""
-        books_borrowed = self.filter_borrowed_books_by_user(email)
-        for book_details in books_borrowed:
-            if book_details['booK_id'] == str(book_id):
-                self.user_borrowed_books.remove(book_details)
-                return "book returned"
-            continue
-        return "book does not exist"
     def reset_password(self, email,new_password):
         """resets user password, if forgoten, 
            user has to provide valid email
