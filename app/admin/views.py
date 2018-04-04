@@ -2,11 +2,11 @@
 
 from flask import make_response, request, jsonify
 from flask_jwt_extended import jwt_required, create_access_token,get_jwt_identity
+import json
 import re
 #local imports
 from app import user, admin_user
 from . import admin
-
 
 @admin.route('/auth/api/v1/admin/login', methods=['POST'])
 def login():
@@ -74,12 +74,12 @@ def add_book():
 def modify_book(book_id):
     '''modifys book information'''
     if request.method == 'PUT':
-       author = request.json.get('new_author')
-       title = request.json.get('new_title')
-       publisher = request.json.get('new_publisher')
-       edition = request.json.get('new_edition')
-       category = request.json.get('new_category')
-       if len(title) == 0 or len(publisher) == 0 or len(edition) == 0 or len(category) == 0:
+       author = request.json.get('author')
+       title = request.json.get('title')
+       publisher = request.json.get('publisher')
+       edition = request.json.get('edition')
+       category = request.json.get('category')
+       if len(author) == 0 or len(title) == 0 or len(publisher) == 0 or len(edition) == 0 or len(category) == 0:
           return make_response(jsonify(
               {'message':'no empty inputs allowed'}
           )), 409
