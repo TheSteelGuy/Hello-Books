@@ -6,7 +6,7 @@ import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import jwt_required, create_access_token,get_jwt_identity
 
-class User(Base):
+class Users(Base):
     """user class contains methods allowed for user object"""
     def __init__(self):
         """person constructor"""
