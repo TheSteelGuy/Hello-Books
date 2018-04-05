@@ -8,7 +8,7 @@ import json
 #local import
 from app import user_object as user,admin_user,create_app
 
-class TestBase(TestCase):
+class TestBase(unittest.TestCase):
     """ common class"""
     def create_app(self):
          config_name = 'testing'
@@ -115,10 +115,14 @@ class TestAdmin(TestBase):
         book_id = "nvjkbvksbhckvbhc"
         delete = admin_user.delete_book_details(book_id)
         self.assertEqual(delete,'book does not exist')
-    
-    
 
-        
+    def test_reset_admin_defaults(self):
+        new_det = admin_user.reset_default_password('admin','new_username','admin12','new_pwd','collins0chieng.com')
+        self.assertEqual(new_det,'admin details updated')
+
+    def test_get_user(self):
+        user = admin_user.get_all_users()  
+        self.assertEqual(len(user),0)      
 if __name__ == '__main__':
     unittest.main()
 

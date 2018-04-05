@@ -37,7 +37,7 @@ class TestBase(TestCase):
         }
 
         self.book ={
-            'author':'author',
+            'author':'author author',
             'title':'sometitle',
             'publisher':'pbpublisher',
             'edition':'testedition',
