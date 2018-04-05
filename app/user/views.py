@@ -22,51 +22,44 @@ def homepage():
 def register():
     """method to handle register requests"""
     if request.method == 'POST':
-        try:
-
-            details = request.get_json()
-            username = details.get('username')
-            email = details.get('email')
-            password = details.get('password')
-            confirm_pwd = details.get('confirm_pwd')
-            response = users.register(username,email,password,confirm_pwd)
-            if response == 'username exists choose another name!':    
-               return make_response(jsonify(
-                   {'message':'username exists choose another name!'}
-               )), 409
-            if response == "Email is already in use":    
-               return make_response(jsonify(
-                   {'message':"Email is already in use"}
-               )), 409
-            if response == "Invalid email":    
-               return make_response(jsonify(
-                   {'message':response}
-               )), 400
-            if response == "password length should be more than 3 characters":    
-               return make_response(jsonify(
-                   {'message':response}
-               )), 400
-            if response == "username cannot be empty, or non alphabet":    
-               return make_response(jsonify(
-                   {'message':response}
-               )), 400
-            if response == "password does not match":    
-               return make_response(jsonify(
-                   {'message':response}
-               )), 400
-            if response == "registration succesfull": 
-               access_token = create_access_token(identity=email)  
-               return make_response(jsonify(
-                   {
-                       'message':response,
-                       'token': access_token
-                   }
-               )), 201
-        except Exception as e:
-            return make_response(jsonify(
-                {'message':e}
-            ))
-    
+       details = request.get_json()
+       username = details.get('username')
+       email = details.get('email')
+       password = details.get('password')
+       confirm_pwd = details.get('confirm_pwd')
+       response = users.register(username,email,password,confirm_pwd)
+       if response == 'username exists choose another name!':    
+          return make_response(jsonify(
+              {'message':'username exists choose another name!'}
+          )), 409
+       if response == "Email is already in use":    
+          return make_response(jsonify(
+              {'message':"Email is already in use"}
+          )), 409
+       if response == "Invalid email":    
+          return make_response(jsonify(
+              {'message':response}
+          )), 400
+       if response == "password length should be more than 3 characters":    
+          return make_response(jsonify(
+              {'message':response}
+          )), 400
+       if response == "username cannot be empty, or non alphabet":    
+          return make_response(jsonify(
+              {'message':response}
+          )), 400
+       if response == "password does not match":    
+          return make_response(jsonify(
+              {'message':response}
+          )), 400
+       if response == "registration succesfull": 
+          access_token = create_access_token(identity=email)  
+          return make_response(jsonify(
+              {
+                  'message':response,
+                  'token': access_token
+              }
+          )), 201
     
 @user.route('/auth/api/v1/login',methods=['POST'])
 def login():
@@ -109,6 +102,7 @@ def get_books():
 @user.route('/api/v1/users/books/<book_id>',methods=['POST'])
 @jwt_required
 def borrow_book(book_id):
+    """ borrow book"""
     if request.method == 'POST':
         author = request.json.get('author')
         title = request.json.get('title')
@@ -132,7 +126,7 @@ def borrow_book(book_id):
             {'book borrowed':response}
         )), 200
 
-@user.route('/api/v1/users/<book_id>', methods=['POST'])
+'''@user.route('/api/v1/users/<book_id>', methods=['POST'])
 def return_book(book_id):
     """Allow a user to return a book borrowed"""
     if request.method == 'POST':
@@ -144,7 +138,7 @@ def return_book(book_id):
         else:
             return make_response(jsonify(
                 {'message':response}
-            )), 404
+            )), 404'''
 
             
 @user.route('/api/v1/books/<book_id>')
@@ -156,7 +150,7 @@ def retrieve_book_by_id(book_id):
             {'message':response}
         )), 200
 
-@user.route('/api/v1/user/history')
+'''@user.route('/api/v1/user/history')
 def show_my_borrowing(self):
     """ shows a user borrowing history"""
     if not session.get('email'):
@@ -173,16 +167,11 @@ def show_my_borrowing(self):
         else:
             return make_response(jsonify(
                 {'borrowed books':response}
-            )), 200
+            )), 200 '''
 
 @user.route('/api/auth/logout')
+@jwt_required
 def logout():
-    if not session.get('email'):
-        return make_response(jsonify(
-            {'message':'you are not logged in'}
-        )), 403
-    if request.method == 'GET':
-        session.pop('email')
         return make_response(jsonify(
             {'message':'successfully logged out'}
         )), 200
@@ -193,10 +182,15 @@ def reset_password():
     if request.method == 'POST':
        email = request.json.get('email')
        new_password = request.json.get('new_password')
-       response = users.reset_password(email,new_password)
-       if response == 'password reset was succesfull':
+       if not email or new_password:
            return make_response(jsonify(
-               {'messaage':response}
-           )), 200
+               {'message':'you need to pass all data in json format'}
+           )), 400
+       else:
+           response = users.reset_password(email,new_password)
+           if response == 'password reset was succesfull':
+              return make_response(jsonify(
+                  {'messaage':response}
+              )), 200
         
 
