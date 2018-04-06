@@ -12,11 +12,11 @@ import os
 #local imports
 from app.config import app_config
 from  .models.user import Users
-from .models.admin import Admin
+from .models.admin import Administration
 from . error import method_not_allowed, server_error, resource_not_found
 
 user_object = Users()
-admin_user = Admin()
+admin_user = Administration()
 
 def create_app(config_name):
     app = Flask(__name__)
