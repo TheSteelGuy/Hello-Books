@@ -9,6 +9,7 @@ class Base(object):
         self.books_list = list()
         self.books_category_list = []
         self.borrowed_books = []
+        self.copies = 0
  
     def get_all_books(self):
         """ gets all books within the library"""
