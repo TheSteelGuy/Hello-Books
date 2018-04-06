@@ -48,7 +48,11 @@ def add_book():
           publisher = request.json.get('publisher')
           edition = request.json.get('edition')
           category = request.json.get('category')
-          response = admin_user.add_book(author, title, publisher, edition, category)
+          copies = request.json.get('copies')
+          if not copies.isdigit():
+             return make_response(jsonify(
+                 {'message':'you must enter postive digits only'}
+             )), 409
           if len(author) == 0 or len(title) == 0 or len(publisher) == 0 or len(edition) == 0 or len(category) == 0:
              return make_response(jsonify(
                  {'message':'no empty inputs allowed'}
@@ -61,7 +65,7 @@ def add_book():
              return make_response(jsonify(
                  {'message':'author must be in form of Evalyn James'}
              )), 409  
-          
+          response = admin_user.add_book(author, title, publisher, edition, category, copies)
           if response == "book with similar details exists":
               return make_response(jsonify(
                   {'message':response}
@@ -73,7 +77,8 @@ def add_book():
                      'title':title,
                      'publisher':publisher,
                      'edition':edition,
-                     'category':category
+                     'category':category,
+                     'copies': copies
                  }
              )), 201
     except:
@@ -133,11 +138,13 @@ def delete_book(book_id):
     """allows the admin to delete/remove book details"""
     if request.method == 'DELETE':
         response = admin_user.delete_book_details(str(book_id))
-        if response == "book deleted":
+        if response:
             return make_response(jsonify(
                 {'message':'book details removed succesfully'}
-            )), 204
-
+            )), 200
+        return make_response(jsonify(
+            {'message':'book id provided does exist, check and try again'}
+        )), 404
       
 @admin.route('/api/v1/auth/logout')
 @jwt_required
