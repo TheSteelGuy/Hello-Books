@@ -5,7 +5,7 @@ from .base import Base
 from datetime import date
 import uuid
 
-class Admin(Base):
+class Administration(Base):
     """
     The admin class Contains methods that manage the site
     """
@@ -13,7 +13,6 @@ class Admin(Base):
         """admin class constructor"""
         Base.__init__(self)
         self.admin_list = [{'username':'admin','password':'admin12'}]
-        self.total_books = 0
 
     def login(self, username, password):
         """admin login method"""
@@ -46,7 +45,7 @@ class Admin(Base):
         return self.users_list
     
 
-    def add_book(self, author, title, publisher, edition, category):
+    def add_book(self, author, title, publisher, edition, category, copies):
         """ creates a book which does not exist"""
         book_dict = dict()   
         for book in self.books_list:
@@ -59,10 +58,11 @@ class Admin(Base):
            book_dict['publisher'] = publisher
            book_dict['edition'] = edition
            book_dict['category'] = category
+           book_dict['copies'] = copies
            book_dict['book_id'] = str(uuid.uuid4())
            book_dict['date_added'] = date.today().isoformat()
            self.books_list.append(book_dict)
-           self.total_books += 1
+           self.copies += 1
            return "book created" 
 
     def modify_book_details(self, new_author, new_title, new_publisher, new_edition, new_category, book_id):
@@ -84,10 +84,10 @@ class Admin(Base):
     def delete_book_details(self, book_id):
         """removes the book details given a title and author"""
         for book in self.books_list:
-            if book['book_id'] == book_id:   
-                   self.books_list.remove(book)
-                   self.total_books -= 1 
-                   return "book deleted"
+            if book['book_id'] == str(book_id):   
+                self.books_list.remove(book)
+                self.copies -= 1 
+                return True
             continue
         return "book does not exist"
 
@@ -97,6 +97,6 @@ class Admin(Base):
             if book['book_id'] == str(book_id):
                 return book
             continue
-        return "email provided does not match any user" 
+        return "book id provided does not match any book" 
         
     
