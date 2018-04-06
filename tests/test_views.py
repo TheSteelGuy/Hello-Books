@@ -19,7 +19,7 @@ class TestBase(TestCase):
     
     def setUp(self):
         """ gets run before any test"""
-        self.admin = admin_user.add_book('testauthor','testtitle','testpublisher','tested','testcateg')
+        self.admin = admin_user.add_book('testauthor','testtitle','testpublisher','tested','testcateg',10)
         self.reg_details = {
             'username':'userone',
             'email':'testemail1@gmail.com',
@@ -70,7 +70,7 @@ class TestUserViews(TestBase):
     
     def test_get_books(self):
         """test if a user can retrieve books"""
-        admin_user.add_book('col','test1','testpublisher1','tested','testcateg')
+        admin_user.add_book('col','test1','testpublisher1','tested','testcateg',5)
         res = self.client.get(
             '/api/v1/books'
         )

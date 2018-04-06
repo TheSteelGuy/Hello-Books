@@ -19,7 +19,7 @@ class TestBase(unittest.TestCase):
     def setUp(self):
         """ gets run before any test"""
         self.user1 = user.register('testuser','testemail@gmail.com','testpass1','testpass1')
-        self.admin = admin_user.add_book('testauthor','testtitle','testpublisher','tested','testcateg')
+        self.admin = admin_user.add_book('testauthor','testtitle','testpublisher','tested','testcateg',10)
 
 
     def tearDown(self):
@@ -71,7 +71,7 @@ class TestUser(TestBase):
     def test_get_books(self):
         """test user access to all books"""
         books = admin_user.get_all_books()
-        self.assertEqual(len(books),7)
+        self.assertEqual(len(books),8)
         
     def test_user_borrow(self):
         """test if a user can borrow a book"""
@@ -104,10 +104,10 @@ class TestAdmin(TestBase):
 
     def test_delete_book(self):
         """tests admin delete book details"""
-        admin_user.add_book('testauthor2','testtitle2','testpublisher2','tested2','testcateg2')
+        admin_user.add_book('testauthor2','testtitle2','testpublisher2','tested2','testcateg2',10)
         book_id = admin_user.books_list[0]['book_id']
         delete = admin_user.delete_book_details(book_id)
-        self.assertEqual(delete,'book deleted')
+        self.assertEqual(delete,True)
         self.assertFalse(len(admin_user.books_list)==2)
 
     def test_delete_with_wrong_details(self):
