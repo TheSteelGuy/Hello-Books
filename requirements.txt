@@ -59,6 +59,6 @@ typing==3.5.3.0
 urllib3==1.22
 visitor==0.1.3
 webencodings==0.5.1
-Werkzeug==0.13
+Werkzeug==0.15.3
 wrapt==1.10.11
 WTForms==2.1
